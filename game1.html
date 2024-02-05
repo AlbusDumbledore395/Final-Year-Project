@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - Word Scramble Game</title>
+<style>
+    /* Import Google font - Poppins */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  display: flex;
+  padding: 0 10px;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #fff 50%, #9d14dc 50%);
+}
+
+.container {
+  width: 420px;
+  border-radius: 10px;
+  background: #222;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.container h2 {
+  font-size: 28px;
+  font-weight: 600;
+  padding: 20px 25px;
+  border-bottom: 1px solid #333;
+  color: #fff;
+}
+
+.container .content {
+  margin: 25px 20px 35px;
+}
+
+.content .word {
+  user-select: none;
+  font-size: 36px;
+  font-weight: 600;
+  text-align: center;
+  letter-spacing: 18px;
+  margin-right: -18px;
+  word-break: break-all;
+  text-transform: uppercase;
+  color: #5372f0;
+}
+
+.content .details {
+  margin: 25px 0 20px;
+}
+
+.details p {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #bbb;
+}
+
+.details p b {
+  font-weight: 500;
+}
+
+.content input {
+  width: 100%;
+  height: 50px;
+  outline: none;
+  padding: 0 15px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background-color: #111;
+  color: #bbb;
+  transition: border-color 0.3s ease, background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.content input:focus {
+  border-color: #5372f0;
+  background-color: #222;
+  color: #fff;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.content input::placeholder {
+  color: #555;
+}
+
+.content input:focus::placeholder {
+  color: #bbb;
+}
+
+.content .buttons {
+  display: flex;
+  margin-top: 20px;
+  justify-content: space-between;
+}
+
+.buttons button {
+  border: none;
+  outline: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 14px 0;
+  font-size: 16px;
+  border-radius: 8px;
+  width: calc(50% - 6px);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.buttons button:active {
+  transform: scale(0.97);
+}
+
+.buttons .refresh-word {
+  background: #6c757d;
+}
+
+.buttons .refresh-word:hover {
+  background: #5f666d;
+}
+
+.buttons .check-word {
+  background: #5372f0;
+}
+
+.buttons .check-word:hover {
+  background: #2c52ed;
+}
+</style>
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div class="container">
+  <h2>Word Scramble</h2>
+  <div class="content">
+    <p class="word"></p>
+    <div class="details">
+      <p class="hint">Hint: <span></span></p>
+      <p class="time">Time Left: <span><b>30</b>s</span></p>
+    </div>
+    <input type="text" spellcheck="false" placeholder="Enter a valid word">
+    <div class="buttons">
+      <button class="refresh-word">Refresh Word</button>
+      <button class="check-word">Check Word</button>
+    </div>
+  </div>
+</div>
+<!-- partial -->
+  <script>
+    // Array of words with their corresponding hints
+
+let words = [
+    // Each object represents a word and its hint
+    {
+      word: "addition",
+      hint: "The process of adding numbers"
+    },
+    {
+      word: "meeting",
+      hint: "Event in which people come together"
+    },
+    {
+      word: "number",
+      hint: "Math symbol used for counting"
+    },
+    {
+      word: "exchange",
+      hint: "The act of trading"
+    },
+    {
+      word: "canvas",
+      hint: "Piece of fabric for oil painting"
+    },
+    {
+      word: "garden",
+      hint: "Space for planting flower and plant"
+    },
+    {
+      word: "position",
+      hint: "Location of someone or something"
+    },
+    {
+      word: "feather",
+      hint: "Hair like outer covering of bird"
+    },
+    {
+      word: "comfort",
+      hint: "A pleasant feeling of relaxation"
+    },
+    {
+      word: "tongue",
+      hint: "The muscular organ of mouth"
+    },
+    {
+      word: "expansion",
+      hint: "The process of increase or grow"
+    },
+    {
+      word: "country",
+      hint: "A politically identified region"
+    },
+    {
+      word: "group",
+      hint: "A number of objects or persons"
+    },
+    {
+      word: "taste",
+      hint: "Ability of tongue to detect flavour"
+    },
+    {
+      word: "store",
+      hint: "Large shop where goods are traded"
+    },
+    {
+      word: "field",
+      hint: "Area of land for farming activities"
+    },
+    {
+      word: "friend",
+      hint: "Person other than a family member"
+    },
+    {
+      word: "pocket",
+      hint: "A bag for carrying small items"
+    },
+    {
+      word: "needle",
+      hint: "A thin and sharp metal pin"
+    },
+    {
+      word: "expert",
+      hint: "Person with extensive knowledge"
+    },
+    {
+      word: "statement",
+      hint: "A declaration of something"
+    },
+    {
+      word: "second",
+      hint: "One-sixtieth of a minute"
+    },
+    {
+      word: "library",
+      hint: "Place containing collection of books"
+    }
+  ];
+  
+  const wordText = document.querySelector(".word"),
+    hintText = document.querySelector(".hint span"),
+    timeText = document.querySelector(".time b"),
+    inputField = document.querySelector("input"),
+    refreshBtn = document.querySelector(".refresh-word"),
+    checkBtn = document.querySelector(".check-word");
+  
+  let correctWord, timer;
+  
+  // Function to initialize the timer
+  const initTimer = (maxTime) => {
+    clearInterval(timer);
+    timer = setInterval(() => {
+      if (maxTime > 0) {
+        maxTime--;
+        return (timeText.innerText = maxTime);
+      }
+      alert(`Time off! ${correctWord.toUpperCase()} was the correct word`);
+      initGame();
+    }, 1000);
+  };
+  
+  // Function to initialize the game
+  const initGame = () => {
+    initTimer(30);
+    let randomObj = words[Math.floor(Math.random() * words.length)];
+    let wordArray = randomObj.word.split("");
+    for (let i = wordArray.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      [wordArray[i], wordArray[j]] = [wordArray[j], wordArray[i]];
+    }
+    wordText.innerText = wordArray.join("");
+    hintText.innerText = randomObj.hint;
+    correctWord = randomObj.word.toLowerCase();
+    inputField.value = "";
+    inputField.setAttribute("maxlength", correctWord.length);
+  };
+  initGame();
+  
+  // Function to check the user's input word
+  const checkWord = () => {
+    let userWord = inputField.value.toLowerCase();
+    if (!userWord) return alert("Please enter the word to check!");
+    if (userWord !== correctWord)
+      return alert(`Oops! ${userWord} is not a correct word`);
+    alert(`Congrats! ${correctWord.toUpperCase()} is the correct word`);
+    initGame();
+  };
+  
+  // Event listeners for the refresh and check buttons
+  refreshBtn.addEventListener("click", initGame);
+  checkBtn.addEventListener("click", checkWord);
+  </script>
+
+</body>
+</html>

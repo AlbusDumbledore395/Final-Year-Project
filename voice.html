@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Stress Analyzer</title>
+    <style>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+        * {
+            outline: none;
+            box-sizing: border-box;
+        }
+body {
+  font-family: var(--body-font);
+  background-image: url(https://wallpapershome.com/images/wallpapers/macos-big-sur-1280x720-dark-wwdc-2020-22655.jpg);
+  background-size: 100%;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 2em;
+  width: 100%;
+  height: 100vh;
+}
+@media screen and (max-width: 480px) {
+  body {
+    padding: 0.8em;
+  }
+}
+.video-bg {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}
+.video-bg video {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+        h1 {
+            color: whitesmoke;
+            margin-bottom: 20px;
+        }
+
+        img {
+            width: 80%;
+            max-width: 500px;
+            height: auto;
+            border: 2px solid #333;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+        #preloader {
+    background: white url("static/pre-loader.gif") no-repeat center;
+    height: 100vh;
+    width: 100%;
+    position: fixed;
+    z-index: 1000; /* Increased z-index */
+}
+.app {
+  background-color: var(--theme-bg-color);
+  max-width: 1800px;
+  max-height: 1000px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  border-radius: 14px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  font-size: 15px;
+  font-weight: 500;
+}
+:root {
+  --theme-bg-color: rgba(16 18 27 / 40%);
+  --border-color: rgba(113 119 144 / 25%);
+  --theme-color: #f9fafb;
+  --inactive-color: rgb(113 119 144 / 78%);
+  --body-font: "Poppins", sans-serif;
+  --hover-menu-bg: rgba(12 15 25 / 30%);
+  --content-title-color: #999ba5;
+  --content-bg: rgb(146 151 179 / 13%);
+  --button-inactive: rgb(249 250 251 / 55%);
+  --dropdown-bg: #21242d;
+  --dropdown-hover: rgb(42 46 60);
+  --popup-bg: rgb(22 25 37);
+  --search-bg: #14162b;
+  --overlay-bg: rgba(36, 39, 59, 0.3);
+  --scrollbar-bg: rgb(1 2 3 / 40%);
+}
+
+.light-mode {
+  --theme-bg-color: rgb(255 255 255 / 31%);
+  --theme-color: #3c3a3a;
+  --inactive-color: #333333;
+  --button-inactive: #3c3a3a;
+  --search-bg: rgb(255 255 255 / 31%);
+  --dropdown-bg: #f7f7f7;
+  --overlay-bg: rgb(255 255 255 / 30%);
+  --dropdown-hover: rgb(236 236 236);
+  --border-color: rgb(255 255 255 / 35%);
+  --popup-bg: rgb(255 255 255);
+  --hover-menu-bg: rgba(255 255 255 / 35%);
+  --scrollbar-bg: rgb(255 253 253 / 57%);
+  --content-title-color: --theme-color;
+}
+.wrapper {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.left-side {
+  flex-basis: 240px;
+  border-right: 1px solid var(--border-color);
+  padding: 26px;
+  overflow: auto;
+  flex-shrink: 0;
+}
+@media screen and (max-width: 945px) {
+  .left-side {
+    display: none;
+  }
+}
+
+.side-wrapper + .side-wrapper {
+  margin-top: 20px;
+}
+
+.side-title {
+  color: var(--inactive-color);
+  margin-bottom: 14px;
+}
+
+.side-menu {
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+}
+.side-menu a {
+  text-decoration: none;
+  color: var(--theme-color);
+  display: flex;
+  align-items: center;
+  font-weight: 400;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+.side-menu a:hover {
+  background-color: var(--hover-menu-bg);
+}
+.side-menu svg {
+  width: 16px;
+  margin-right: 8px;
+}
+
+.updates {
+  position: relative;
+  top: 0;
+  right: 0;
+  margin-left: auto;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+}
+
+
+.content {
+            flex-grow: 1;
+            padding: 20px 40px;
+            height: 100%;
+            overflow: auto;
+            background-color: var(--theme-bg-color);
+        }
+
+        /* Additional styles for positioning Stress Detector section */
+        .content h1,
+        .content img,
+        .content form {
+            margin-left: 250px; /* Adjust the margin as needed */
+        }
+
+    .container {
+        max-width: 600px;
+        font-size: larger;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: transparent;
+        align-items: center;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center; /* Center the content */
+    }
+
+    h1 {
+        font-size: 50px;
+        margin-bottom: 20px;
+    }
+
+    form {
+        margin-bottom: 20px;
+    }
+
+    label {
+        color:white;
+        margin-bottom: 10px;
+    }
+
+    .file-input-label {
+        display: inline-block;
+        position: relative;
+    }
+
+    input[type="file"] {
+        opacity: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    button {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    #progress-bar {
+        height: 10px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    #progress {
+        height: 100%;
+        width: 0;
+        background-color:black;
+        border-radius: 4px;
+    }
+
+    #result {
+        margin-bottom: 20px;
+    }
+
+    a {
+        display: block;
+        color: #3498db;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    </style>
+</head>
+<body>
+    <div class="video-bg">
+        <video width="320" height="240" autoplay loop muted>
+         <source src="https://assets.codepen.io/3364143/7btrrd.mp4" type="video/mp4">
+       Your browser does not support the video tag.
+       </video>
+       </div>
+           <div class="app">
+           <div id="preloader"></div>
+           <div class="wrapper">
+         <div class="left-side">
+          <div class="side-wrapper">
+           <div class="side-title">Methods</div>
+           <div class="side-menu">
+       <a href="/">
+           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" fill="currentColor">
+               <path d="M488 240H24a8 8 0 0 0-8 8v240a8 8 0 0 0 8 8h144V296h80v192h144a8 8 0 0 0 8-8V248a8 8 0 0 0-8-8zM256 48L10.78 276.73a8 8 0 0 0 0 10.54l23.69 23.69a8 8 0 0 0 10.54 0L256 111.1 431 311.94a8 8 0 0 0 10.54 0l23.69-23.69a8 8 0 0 0 0-10.54L256 48z"/>
+           </svg>
+           Home
+       </a>
+       
+       
+       
+       
+           <a href="/face">
+           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" fill="currentColor">
+               <!-- Replace the existing path with the path for the face icon -->
+               <circle cx="256" cy="256" r="208" fill="currentColor"/>
+               <circle cx="168" cy="184" r="24" fill="black"/>
+               <circle cx="344" cy="184" r="24" fill="black"/>
+               <path d="M256 296c-48 0-88 39.7-88 88s39.7 88 88 88 88-39.7 88-88-39.7-88-88-88zm0 152c-36.5 0-66-29.5-66-66s29.5-66 66-66 66 29.5 66 66-29.5 66-66 66z" fill="black"/>
+           </svg>
+           Face
+       </a>
+       
+       
+       
+            <a href="/voice">
+           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="currentColor" width="10" height="10">
+               <!-- Use the specific path for the microphone icon from Font Awesome -->
+               <path d="M320 64c88.22 0 160 71.78 160 160v128c0 88.22-71.78 160-160 160s-160-71.78-160-160V224c0-88.22 71.78-160 160-160zm0-32C142.2 32 0 174.2 0 352v128c0 22.05 17.95 40 40 40h96c0 35.35 28.65 64 64 64s64-28.65 64-64h96c0 35.35 28.65 64 64 64s64-28.65 64-64h96c22.05 0 40-17.95 40-40V352C640 174.2 497.8 32 320 32zM304 288H160c-17.67 0-32-14.33-32-32s14.33-32 32-32h144c17.67 0 32 14.33 32 32S321.7 288 304 288zM344 176c0-26.51-21.49-48-48-48s-48 21.49-48 48H96c-17.67 0-32 14.33-32 32v160c0 66.26 53.74 120 120 120h288c66.26 0 120-53.74 120-120V208c0-17.67-14.33-32-32-32H344z"></path>
+           </svg>
+           Voice
+       </a>
+       
+       
+       <a href="/dot">
+           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+               <!-- Replace the existing path with the path for the puzzle piece icon -->
+               <path d="M3 13h3v2H3v-2zm0 4h3v2H3v-2zm0-8h3v2H3V9zm0-4h3v2H3V5zm5 8h3v2H8v-2zm0-4h3v2H8V9zm0-4h3v2H8V5zm14 8h-3v-2h3v2zm0-4h-3v-2h3V9zm0-4h-3V5h3V3c0-1.1-.9-2-2-2H3C1.9 1 1 1.9 1 3v18c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2v-2c0 1.1.9 2 2 2s2-.9 2-2v-4c0-1.1-.9-2-2-2s-2 .9-2 2v2zM3 19V3h18v2h-3c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2s2-.9 2-2V7h-3v2h-3V7H8v2H5V7H3v12h3v-2h3v2h8v-2h3v2h3v-2h-3v-2h-3v2H8v-2H5v2H3z"/>
+           </svg>
+           Puzzle
+       </a>
+       
+       <a href="#">
+           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" fill="currentColor" transform="rotate(-180)">
+               <!-- Use the specific path for the pulse rate icon from Font Awesome -->
+               <path d="M416 224h32v64h-32zm-224 0h32v192h-32zm-96 0h32v128H96zM32 224h32v320H32zm288 0h32v256h-32z"></path>
+           </svg>
+           Pulse-Rate
+       </a>
+    </div>
+</div>
+<div class="side-wrapper">
+ <div class="side-title">Features</div>
+ <div class="side-menu">
+  <a href="#">
+   <svg viewBox="0 0 488.455 488.455" fill="currentColor">
+    <path d="M287.396 216.317c23.845 23.845 23.845 62.505 0 86.35s-62.505 23.845-86.35 0-23.845-62.505 0-86.35 62.505-23.845 86.35 0" />
+    <path d="M427.397 91.581H385.21l-30.544-61.059H133.76l-30.515 61.089-42.127.075C27.533 91.746.193 119.115.164 152.715L0 396.86c0 33.675 27.384 61.074 61.059 61.074h366.338c33.675 0 61.059-27.384 61.059-61.059V152.639c-.001-33.674-27.385-61.058-61.059-61.058zM244.22 381.61c-67.335 0-122.118-54.783-122.118-122.118s54.783-122.118 122.118-122.118 122.118 54.783 122.118 122.118S311.555 381.61 244.22 381.61z" />
+   </svg>
+   Song-Recommend
+  </a>
+  <a href="#">
+   <svg viewBox="0 0 512 512" fill="currentColor">
+    <circle cx="295.099" cy="327.254" r="110.96" transform="rotate(-45 295.062 327.332)" />
+    <path d="M471.854 338.281V163.146H296.72v41.169a123.1 123.1 0 01121.339 122.939c0 3.717-.176 7.393-.5 11.027zM172.14 327.254a123.16 123.16 0 01100.59-120.915L195.082 73.786 40.146 338.281H172.64c-.325-3.634-.5-7.31-.5-11.027z" />
+   </svg>
+   V.P.A
+  </a>
+  <a href="#">
+   <svg viewBox="0 0 58 58" fill="currentColor">
+    <path d="M57 6H1a1 1 0 00-1 1v44a1 1 0 001 1h56a1 1 0 001-1V7a1 1 0 00-1-1zM10 50H2v-9h8v9zm0-11H2v-9h8v9zm0-11H2v-9h8v9zm0-11H2V8h8v9zm26.537 12.844l-11 7a1.007 1.007 0 01-1.018.033A1.001 1.001 0 0124 36V22a1.001 1.001 0 011.538-.844l11 7a1.003 1.003 0 01-.001 1.688zM56 50h-8v-9h8v9zm0-11h-8v-9h8v9zm0-11h-8v-9h8v9zm0-11h-8V8h8v9z" />
+   </svg>
+   Moive-Recommend
+  </a>
+  <a href="#">
+   <svg viewBox="0 0 512 512" fill="currentColor">
+    <path d="M499.377 46.402c-8.014-8.006-18.662-12.485-29.985-12.613a41.13 41.13 0 00-.496-.003c-11.142 0-21.698 4.229-29.771 11.945L198.872 275.458c25.716 6.555 47.683 23.057 62.044 47.196a113.544 113.544 0 0110.453 23.179L500.06 106.661C507.759 98.604 512 88.031 512 76.89c0-11.507-4.478-22.33-12.623-30.488zM176.588 302.344a86.035 86.035 0 00-3.626-.076c-20.273 0-40.381 7.05-56.784 18.851-19.772 14.225-27.656 34.656-42.174 53.27C55.8 397.728 27.795 409.14 0 416.923c16.187 42.781 76.32 60.297 115.752 61.24 1.416.034 2.839.051 4.273.051 44.646 0 97.233-16.594 118.755-60.522 23.628-48.224-5.496-112.975-62.192-115.348z" />
+   </svg>
+   Daily-Affirmation
+  </a>
+  <a href="#">
+   <svg viewBox="0 0 512 512" fill="currentColor">
+    <path d="M497 151H316c-8.401 0-15 6.599-15 15v300c0 8.401 6.599 15 15 15h181c8.401 0 15-6.599 15-15V166c0-8.401-6.599-15-15-15zm-76 270h-30c-8.401 0-15-6.599-15-15s6.599-15 15-15h30c8.401 0 15 6.599 15 15s-6.599 15-15 15zm0-180h-30c-8.401 0-15-6.599-15-15s6.599-15 15-15h30c8.401 0 15 6.599 15 15s-6.599 15-15 15z" />
+    <path d="M15 331h196v60h-75c-8.291 0-15 6.709-15 15s6.709 15 15 15h135v-30h-30v-60h30V166c0-24.814 20.186-45 45-45h135V46c0-8.284-6.716-15-15-15H15C6.716 31 0 37.716 0 46v270c0 8.284 6.716 15 15 15z" />
+   </svg>
+   Journals
+  </a>
+  <a href="#">
+   <svg viewBox="0 0 512 512" fill="currentColor">
+    <path d="M0 331v112.295a14.996 14.996 0 007.559 13.023L106 512V391L0 331zM136 391v121l105-60V331zM271 331v121l105 60V391zM406 391v121l98.441-55.682A14.995 14.995 0 00512 443.296V331l-106 60zM391 241l-115.754 57.876L391 365.026l116.754-66.15zM262.709 1.583a15.006 15.006 0 00-13.418 0L140.246 57.876 256 124.026l115.754-66.151L262.709 1.583zM136 90v124.955l105 52.5V150zM121 241L4.246 298.876 121 365.026l115.754-66.15zM271 150v117.455l105-52.5V90z" />
+   </svg>
+   Report
+  </a>
+ </div>
+</div>
+</div>
+
+    <div class="container">
+        <h1>Speech Stress Analyzer</h1>
+        
+        <form id="uploadForm">
+            <label for="audio">Select a .wav file:</label>
+            <label class="file-input-label">
+                <input type="file" id="audio" name="audio" accept=".wav" onchange="displayFileName()" required>
+                <span id="file-name">No file selected</span>
+            </label><br>
+            <button type="button" onclick="analyzeAudio()">Analyze</button>
+        </form>
+        
+        <div id="progress-bar">
+            <div id="progress"></div>
+        </div>
+        
+        <div id="result"></div>
+        
+        <a href="/next">Face Result</a>
+    </div>
+</div>
+
+
+    <script>
+        function displayFileName() {
+        const fileInput = document.getElementById('audio');
+        const fileNameSpan = document.getElementById('file-name');
+
+        if (fileInput.files.length > 0) {
+            fileNameSpan.textContent = fileInput.files[0].name;
+        } else {
+            fileNameSpan.textContent = 'No file selected';
+        }
+    }
+        window.addEventListener("load", function () {
+                        var preloader = document.getElementById("preloader");
+                        preloader.style.display = "none";
+                    });
+        function analyzeAudio() {
+            var formData = new FormData(document.getElementById('uploadForm'));
+            var progressBar = document.getElementById('progress');
+            var resultDiv = document.getElementById('result');
+    
+            // Reset progress bar
+            progressBar.style.width = '0%';
+    
+            fetch('/analyze', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    var stressLevel;
+                    var averageIntensity = data.average_intensity;
+    
+                    if (averageIntensity <= 50) {
+                        stressLevel = 'Low Stress';
+                    } else if (averageIntensity <= 75) {
+                        stressLevel = 'Moderate Stress';
+                    } else {
+                        stressLevel = 'High Stress';
+                    }
+    
+                    resultDiv.innerHTML = `
+                        <p>${data.message}</p>
+                        <p>Average Intensity: ${averageIntensity.toFixed(3)}</p>
+                        <p>Stress Level: ${stressLevel}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p>Error: ${data.message}</p>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `<p>Error: Something went wrong.</p>`;
+            })
+            .finally(() => {
+                // Hide progress bar after completion
+                progressBar.style.display = 'none';
+            });
+    
+            // Update progress bar
+            var interval = setInterval(function () {
+                if (progressBar.style.width == '100%') {
+                    clearInterval(interval);
+                } else {
+                    progressBar.style.width = (parseFloat(progressBar.style.width) + 1) + '%';
+                }
+            }, 50);
+        }
+    </script>
+    
+</body>
+</html>

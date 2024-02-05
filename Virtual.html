@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .chat-container {
+            margin-top: 20px;
+        }
+
+        .chat {
+            height: 200px;
+            overflow-y: scroll;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        .input-container {
+            margin-top: 10px;
+            display: flex;
+        }
+
+        input {
+            flex: 1;
+            padding: 8px;
+        }
+
+        button {
+            padding: 8px 15px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .weather-container {
+            margin-top: 20px;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+    <title>Virtual Personal Assistant</title>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Virtual Personal Assistant</h1>
+        <div class="chat-container">
+            <div class="chat" id="chat-box"></div>
+            <div class="input-container">
+                <input type="text" id="user-input" placeholder="Type here...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+        <div class="weather-container">
+            <input type="text" id="city-input" placeholder="Enter city for weather">
+            <button onclick="getWeather()">Get Weather</button>
+            <div id="weather-result"></div>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var userInput = document.getElementById('user-input').value;
+            var chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML += '<div>User: ' + userInput + '</div>';
+
+            if (userInput.toLowerCase().includes('stress')) {
+                replyToUser('I understand that you may be feeling stressed. How can I help you?');
+            } else if (userInput.toLowerCase().includes('how are you')) {
+                replyToUser('Thank you for asking! I am just a virtual assistant, but I\'m here and ready to assist you.');
+            } else if (userInput.toLowerCase().includes('tell me a joke')) {
+                replyToUser('Sure, here\'s one: Why don\'t scientists trust atoms? Because they make up everything!');
+            } else if (userInput.toLowerCase().includes('nature soundscape generator')) {
+                // Provide a playable link to the hosted nature soundscape audio file
+                replyToUser('Certainly! Here\'s a calming nature soundscape for you: <audio controls><source src="https://raw.githubusercontent.com/your-username/your-repo/main/path/to/your/nature-soundscape.mp3" type="audio/mp3">Your browser does not support the audio element.</audio>');
+            } else {
+                // Default response for non-stress related user messages
+                replyToUser('I appreciate your input. How can I assist you further?');
+            }
+        }
+
+        function getWeather() {
+            var city = document.getElementById('city-input').value;
+            var weatherResult = document.getElementById('weather-result');
+
+            fetch('/get_weather', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'city=' + city,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        weatherResult.innerHTML = 'Error: ' + data.error;
+                    } else {
+                        weatherResult.innerHTML = 'Temperature: ' + data.temperature + ' K.';
+                        replyToUser('The weather in ' + city + ' is ' + data.temperature + ' K.');
+                    }
+                });
+        }
+
+        function replyToUser(message) {
+            var chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML += '<div>Assistant: ' + message + '</div>';
+        }
+    </script>
+</body>
+
+</html>

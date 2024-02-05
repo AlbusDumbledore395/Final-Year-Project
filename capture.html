@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress Detection Result</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .stress-detected {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .no-stress-detected {
+            color: #008000;
+            font-weight: bold;
+        }
+
+        .next-button {
+            font-size: 16px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .next-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stress Detection Result</h1>
+    <p>Overall Average Stress Intensity: {{ stress_result.average_intensity }}</p>
+    {% if stress_result.is_stressed %}
+        <p class="stress-detected">Stress Detected!</p>
+    {% else %}
+        <p class="no-stress-detected">No Stress Detected</p>
+    {% endif %}
+    <a href="/dot" class="next-button">Next</a>
+</body>
+</html>
